@@ -6,6 +6,8 @@
 #include "ActivationFunction.h"
 #include "CostFunction.h"
 
+#include <Eigen/Dense>
+
 #include <iostream>
 #include <vector>
 
@@ -25,10 +27,16 @@ int main(int argc, char** argv)
 
   cout << "Creating a new neural network" << endl;
   NeuralNetwork net = NeuralNetwork(layers, activations, costFunction);
-  NeuralNetwork* net2 = new NeuralNetwork(layers, activations, costFunction);
+ 
+  cout << "Weights" << endl;
+  vector<Eigen::MatrixXd> weights = net.getWeights();
 
-  cout << "Deleting neural network" << endl;
-  delete net2;
+  for(int i = 0; i<4; i++)
+    cout << weights[i] << endl << endl;
+
+  cout << "Activating on [0,1]" << endl;
+
+  
 
   return 0;
 }

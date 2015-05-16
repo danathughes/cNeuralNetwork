@@ -41,7 +41,13 @@ class NeuralNetwork
     CostFunction costFunction;
 
   public:
-    NeuralNetwork(vector<int>, vector<ActivationFunction>, CostFunction); // vector<ActivationFunction> activationFunctions, CostFunction costFunction);
+    NeuralNetwork(vector<int>, vector<ActivationFunction>, CostFunction); 
+    void randomizeWeights();
+    double cost(Eigen::MatrixXd, Eigen::MatrixXd);
+    vector<Eigen::MatrixXd> gradient(Eigen::MatrixXd, Eigen::MatrixXd);
+    vector<Eigen::MatrixXd> getWeights();
+    void updateWeights(vector<Eigen::MatrixXd>);
+    vector<Eigen::VectorXd> activate(Eigen::VectorXd);
 };
 
 #endif
