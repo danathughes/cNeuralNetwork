@@ -40,6 +40,8 @@ class NeuralNetwork
     vector<ActivationFunction> activationFunctions;
     CostFunction costFunction;
 
+
+
   public:
     NeuralNetwork(vector<int>, vector<ActivationFunction>, CostFunction); 
     void randomizeWeights();
@@ -48,6 +50,16 @@ class NeuralNetwork
     vector<Eigen::MatrixXd> getWeights();
     void updateWeights(vector<Eigen::MatrixXd>);
     vector<Eigen::VectorXd> activate(Eigen::VectorXd);
+
+    Eigen::VectorXd activation_function(Eigen::VectorXd);
+    Eigen::VectorXd gradient_function(Eigen::VectorXd);
+    double cost_function(Eigen::VectorXd, Eigen::VectorXd);
+    Eigen::VectorXd cost_gradient(Eigen::VectorXd, Eigen::VectorXd);
+
+    Eigen::VectorXd predict(Eigen::VectorXd);
+    Eigen::VectorXi classify(Eigen::VectorXd);
+
+
 };
 
 #endif

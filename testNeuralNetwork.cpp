@@ -36,6 +36,42 @@ int main(int argc, char** argv)
 
   cout << "Activating on [0,1]" << endl;
 
+  Eigen::VectorXd target = Eigen::VectorXd(3);
+  Eigen::VectorXd output = Eigen::VectorXd(3);
+  target(0) = 1.0; target(1) = 0.0; target(2) = 1.0;
+  output(0) = 1.0; output(1) = 1.0; output(2) = 0.0;
+  cout << "Doing the cost / gradient thing" << endl;
+  cout << "Cost: " << net.cost_function(output, target) << endl;
+  cout << "Grad: " << net.cost_gradient(output, target) << endl;
+
+  cout << "====== Serious XOR stuff =======" << endl;
+
+  Eigen::MatrixXd dataset = Eigen::MatrixXd(2,4);
+  dataset << 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0;
+  Eigen::MatrixXd targets = Eigen::MatrixXd(1,4);
+  targets << 0.0, 1.0, 1.0, 0.0;
+
+  cout << "Dataset" << endl;
+  cout << dataset << endl;
+  cout << "Targets" << endl;
+  cout << targets << endl;
+  cout << "Activations" << endl;
+  vector <Eigen::VectorXd> act = net.activate(dataset.col(0));
+  cout << act[0] << endl;
+  cout << act[1] << endl;
+  cout << act[2] << endl;
+  cout << "Cost = " << net.cost(act[2],targets.col(0)) << endl;
+
+  cout << "====== Serious Backprop stuff =====" << endl;
+
+  vector<Eigen::MatrixXd> gradient = net.gradient(dataset, targets);
+
+  cout << "I'm back!" << endl;
+
+  for(int i=0; i<gradient.size(); i++)
+  {
+    cout << gradient[i] << endl;
+  }
   
 
   return 0;
