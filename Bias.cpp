@@ -2,7 +2,7 @@
 * 
 */
 
-#include "connections/Bias.h"
+#include "Bias.h"
 
 #include <Eigen/Dense>
 

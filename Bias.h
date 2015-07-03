@@ -17,8 +17,8 @@
 
 #include <Eigen/Dense>
 
-#include "layer/Layer.h"
-#include "connections/Connection.h"
+#include "Layer.h"
+#include "Connection.h"
 
 #ifndef __BIAS_H__
 #define __BIAS_H__

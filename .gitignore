@@ -1,0 +1,31 @@
+### C++ ###
+# This was created by https://www.gitignore.io, because I'm lazy
+
+# Ignore Compiled Object Files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Ignore Precompiled Headers
+*.gch
+*.pch
+
+# Ignore Compiled Dynamic Libraries
+*.so
+*.dylib
+*.dll
+
+# Ignore Fortran module files
+*.mod
+
+# Ignore Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Ignore Executables
+*.exe
+*.out
+*.app
