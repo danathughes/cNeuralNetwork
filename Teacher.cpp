@@ -94,7 +94,7 @@ void Teacher::train()
         this->connectionGradients.at(k) += this->connections.at(k)->getGradient();
       }
 
-      cout << this->model->getOutputLayer()->getOutput() << "\t";
+      cout << (this->model->getOutputLayer()->getOutput()).transpose() << "\t";
     }
 
     cout << cost / dataset.size() << endl;

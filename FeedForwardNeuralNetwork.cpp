@@ -14,6 +14,8 @@
 * 
 */
 
+#include <iostream>
+
 #include "FeedForwardNeuralNetwork.h"
 #include <vector>
 using namespace std;

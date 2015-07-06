@@ -38,15 +38,22 @@ void CrossEntropyErrorLayer::activate()
 {
   for(int i=0; i<this->getSize(); i++)
   {
-    this->activations(i) = -(this->target->getOutput()(i) * log(this->net_input(i))
-    this->activations(i) -= (1.0 - this->target->getOutput()(i) * log(1.0 - this->net_input(i))
+    this->activations(i) = -(this->target->getOutput()(i) * log(this->net_input(i)));
+    this->activations(i) -= (1.0 - this->target->getOutput()(i) * log(1.0 - this->net_input(i)));
   }
 }
 
 
 Eigen::VectorXd CrossEntropyErrorLayer::gradient()
 {
-\  return (this->target->getOutput() - this->net_input) / (this->net_input * (1.0 - this->net_input));
+  Eigen::VectorXd grad = Eigen::VectorXd(this->getSize());
+
+  for(int i=0; i<this->getSize(); i++)
+  {
+    grad(i) = (this->target->getOutput()(i) - this->getInput()(i));
+    grad(i) /= (this->getInput()(i) * (1.0 - this->getInput()(i) ));
+  }
+  return grad;
 }
 
 
