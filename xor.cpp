@@ -125,7 +125,7 @@ int main()
 
   Teacher trainer = Teacher(&nn, dataset);
   cout << "Done.  Setting Stopping criteria" << endl;
-  trainer.setStoppingCriteria(new MaxIterationStoppingCriteria(&trainer, 1000));
+  trainer.setStoppingCriteria(new MaxIterationStoppingCriteria(&trainer, 500));
 
   cout << "Done!  Training!" << endl;
   trainer.train();

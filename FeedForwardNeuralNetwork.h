@@ -33,8 +33,13 @@ class FeedForwardNeuralNetwork
     FeedForwardNeuralNetwork();
     ~FeedForwardNeuralNetwork();
 
-    void addInputLayer(Layer* layer);
     void addLayer(Layer* layer);
+
+    // TODO:  Should these be setInputLayer and setOutputLayer?  
+    //        After all, there isn't anything different than this and 
+    //        addLayer, and we have setTargetLayer and setObjectiveLayer
+    //        and we only want one input and output, right?
+    void addInputLayer(Layer* layer);
     void addOutputLayer(Layer* layer);
     void setTargetLayer(Layer* layer);
     void setObjectiveLayer(ObjectiveLayer* layer);
