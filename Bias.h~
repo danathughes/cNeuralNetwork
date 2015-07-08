@@ -45,10 +45,6 @@ class Bias : public Connection
     int getSize();
 
 
-    Eigen::VectorXd getNetOutput();
-    Eigen::VectorXd backpropDelta();
-    int* getDimensions();
-
   private:
     int size;
     Eigen::VectorXd* weights;

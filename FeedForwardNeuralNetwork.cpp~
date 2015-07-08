@@ -58,8 +58,7 @@ void FeedForwardNeuralNetwork::addConnection(Connection* connection)
 
 void FeedForwardNeuralNetwork::addBias(Bias* bias)
 {
-  // this->biases.push_back(bias);
-  this->connections.push_back((Connection*) bias);
+  this->biases.push_back(bias);
 }
 
 
@@ -119,13 +118,10 @@ vector<Connection*> FeedForwardNeuralNetwork::getConnections()
 }
 
 
-/*
 vector<Bias*> FeedForwardNeuralNetwork::getBiases()
 {
   return this->biases;
 }
-*/
-
 
 vector<Layer*> FeedForwardNeuralNetwork::getLayers()
 {

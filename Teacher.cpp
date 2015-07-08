@@ -28,19 +28,12 @@ Teacher::Teacher(FeedForwardNeuralNetwork* model, vector<SupervisedData*> datase
   this->model = model;
 
   this->connections = model->getConnections();
-  this->biases = model->getBiases();
 
   vector<Eigen::MatrixXd> connectionGradients;
-  vector<Eigen::VectorXd> biasGradients;
 
   for(int i=0; i<connections.size(); i++)
   {
     this->connectionGradients.push_back(connections.at(i)->getGradient());
-  }
-
-  for(int i=0; i<biases.size(); i++)
-  {
-    this->biasGradients.push_back(biases.at(i)->getGradient());
   }
 }
 
@@ -63,11 +56,6 @@ void Teacher::train()
   {
     cost = 0.0;
 
-    for(int j=0; j<this->biasGradients.size(); j++)
-    {
-      this->biasGradients.at(j) *= 0;
-    }
-
     for(int j=0; j<this->connectionGradients.size(); j++)
     {
       this->connectionGradients.at(j) *= 0;
@@ -84,11 +72,6 @@ void Teacher::train()
       cost += this->model->getObjectiveLayer()->cost();
       this->model->backward(); 
 
-      for(int k=0; k<this->biases.size(); k++)
-      {
-        this->biasGradients.at(k) += this->biases.at(k)->getGradient();
-      }
-
       for(int k=0; k<this->connections.size(); k++)
       {
         this->connectionGradients.at(k) += this->connections.at(k)->getGradient();
@@ -102,11 +85,6 @@ void Teacher::train()
     for(int j=0; j<this->connections.size(); j++)
     {
       this->connections.at(j)->updateWeights(-learningRate*this->connectionGradients.at(j));
-    }
-
-    for(int j=0; j<biases.size(); j++)
-    {
-      this->biases.at(j)->updateWeights(-learningRate*this->biasGradients.at(j));
     }
 
     numIterations++;

@@ -12,7 +12,7 @@
 
 using namespace std;
 
-FullConnection::FullConnection(Layer* inLayer, Layer* outLayer) : Connection()
+FullConnection::FullConnection(Layer* inLayer, Layer* outLayer) : Connection(inLayer, outLayer)
 {
   this->inLayer = inLayer;
   this->outLayer = outLayer;

@@ -22,7 +22,7 @@
 class Connection
 {
   public:
-    Connection() {};
+    Connection(Layer* inLayer, Layer* outLayer) {};
     ~Connection() {};
     virtual Eigen::VectorXd getNetOutput()=0;
     virtual Eigen::VectorXd backpropDelta()=0;
