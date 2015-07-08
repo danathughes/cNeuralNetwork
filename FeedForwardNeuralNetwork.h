@@ -18,6 +18,7 @@
 #include "ObjectiveLayer.h"
 #include "Connection.h"
 #include "Bias.h"
+#include "SupervisedData.h"
 
 #include <vector>
 
@@ -59,6 +60,8 @@ class FeedForwardNeuralNetwork
     Layer* getInputLayer();
     Layer* getOutputLayer();
     ObjectiveLayer* getObjectiveLayer();
+
+    vector<Eigen::MatrixXd> getParameterGradients(SupervisedData* data);
 
   private:
     vector<Layer*> layers;

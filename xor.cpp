@@ -64,7 +64,8 @@ FeedForwardNeuralNetwork createNetwork()
   cout << "Creating Layers" << endl;
   Layer* in = new LinearLayer(2);
   Layer* l1 = new TanhLayer(2);
-  Layer* out = new SigmoidLayer(1);
+//  Layer* out = new SigmoidLayer(1);
+  Layer* out = new SigmoidLayer(2);
 
   cout << "Creating connections and biases" << endl;
   FullConnection* f1 = new FullConnection(in, l1);
@@ -73,10 +74,10 @@ FeedForwardNeuralNetwork createNetwork()
   FullConnection* f2 = new FullConnection(l1, out);
   Bias* b2 = new Bias(out);
 
-  Layer* target = new LinearLayer(1);
-  ObjectiveLayer* objective = new SquaredErrorLayer(1, target);
-//  Layer* target = new LinearLayer(2);
-//  ObjectiveLayer* objective = new CrossEntropyErrorLayer(2, target);
+//  Layer* target = new LinearLayer(1);
+//  ObjectiveLayer* objective = new SquaredErrorLayer(1, target);
+  Layer* target = new LinearLayer(2);
+  ObjectiveLayer* objective = new CrossEntropyErrorLayer(2, target);
   IdentityConnection* id1 = new IdentityConnection(out, objective);
 
   cout << "Creating neural network" << endl;
@@ -125,7 +126,7 @@ int main()
 
   Teacher trainer = Teacher(&nn, dataset);
   cout << "Done.  Setting Stopping criteria" << endl;
-  trainer.setStoppingCriteria(new MaxIterationStoppingCriteria(&trainer, 5000));
+  trainer.setStoppingCriteria(new MaxIterationStoppingCriteria(&trainer, 10000));
 
   cout << "Done!  Training!" << endl;
   trainer.train();

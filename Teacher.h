@@ -43,10 +43,7 @@ class Teacher
     vector<SupervisedData*> dataset;
 
     vector<Connection*> connections;
-    // vector<Bias*> biases;
-
     vector<Eigen::MatrixXd> connectionGradients;
-    // vector<Eigen::MatrixXd> biasGradients;
 
     StoppingCriteria* stoppingCriteria;
 };

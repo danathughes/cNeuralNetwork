@@ -49,6 +49,7 @@ void Teacher::train()
   double cost = 0.0;
   double learningRate = 0.25;
   int numIterations = 0;
+  vector<Eigen::MatrixXd> gradients;
 
   this->stoppingCriteria->reset();
 
@@ -65,17 +66,18 @@ void Teacher::train()
 
     for(int j=0; j<this->dataset.size(); j++)
     {    
-      this->model->setInput(this->dataset.at(j)->getInput());
-      this->model->setTarget(this->dataset.at(j)->getTarget());
+      gradients = this->model->getParameterGradients(this->dataset.at(j));
 
-      this->model->forward();
+      // Determine the cost - gradients should have set this up through forward()
       cost += this->model->getObjectiveLayer()->cost();
-      this->model->backward(); 
+
+
 
       for(int k=0; k<this->connections.size(); k++)
       {
-        this->connectionGradients.at(k) += this->connections.at(k)->getGradient();
+        this->connectionGradients.at(k) += gradients.at(k);
       }
+
 
       cout << (this->model->getOutputLayer()->getOutput()).transpose() << "\t";
     }

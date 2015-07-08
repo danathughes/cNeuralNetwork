@@ -15,9 +15,12 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <Eigen/Dense>
 
 #include "FeedForwardNeuralNetwork.h"
-#include <vector>
+#include "SupervisedData.h"
+
 using namespace std;
 
 FeedForwardNeuralNetwork::FeedForwardNeuralNetwork()
@@ -148,4 +151,26 @@ ObjectiveLayer* FeedForwardNeuralNetwork::getObjectiveLayer()
 Layer* FeedForwardNeuralNetwork::getInputLayer()
 {
   return this->inputLayer;
+}
+
+vector<Eigen::MatrixXd> FeedForwardNeuralNetwork::getParameterGradients(SupervisedData* data)
+{
+  vector<Eigen::MatrixXd> gradients;
+
+  // Set the input and target
+  this->setInput(data->getInput());
+  this->setTarget(data->getTarget());
+
+  // Perform a forward pass to get activations
+  this->forward();
+  // Backpropagate the errors
+  this->backward();
+
+  // Get the gradients in each layer
+  for(int i=0; i<this->connections.size(); i++)
+  {
+    gradients.push_back(this->connections.at(i)->getGradient());
+  }
+
+  return gradients;
 }

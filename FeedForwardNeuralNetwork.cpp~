@@ -15,9 +15,12 @@
 */
 
 #include <iostream>
+#include <vector>
+#include <Eigen/Dense>
 
 #include "FeedForwardNeuralNetwork.h"
-#include <vector>
+#include "SupervisedData.h"
+
 using namespace std;
 
 FeedForwardNeuralNetwork::FeedForwardNeuralNetwork()
@@ -58,7 +61,8 @@ void FeedForwardNeuralNetwork::addConnection(Connection* connection)
 
 void FeedForwardNeuralNetwork::addBias(Bias* bias)
 {
-  this->biases.push_back(bias);
+  // this->biases.push_back(bias);
+  this->connections.push_back((Connection*) bias);
 }
 
 
@@ -118,10 +122,13 @@ vector<Connection*> FeedForwardNeuralNetwork::getConnections()
 }
 
 
+/*
 vector<Bias*> FeedForwardNeuralNetwork::getBiases()
 {
   return this->biases;
 }
+*/
+
 
 vector<Layer*> FeedForwardNeuralNetwork::getLayers()
 {
@@ -144,4 +151,35 @@ ObjectiveLayer* FeedForwardNeuralNetwork::getObjectiveLayer()
 Layer* FeedForwardNeuralNetwork::getInputLayer()
 {
   return this->inputLayer;
+}
+
+vector<Eigen::MatrixXd> FeedForwardNeuralNetwork::getParameterGradients(SupervisedData* data)
+{
+  cout << "A";
+  vector<Eigen::MatrixXd> gradients;
+
+  cout << "B";
+  // Set the input and target
+  this->setInput(data->getInput());
+  this->setTarget(data->getTarget());
+
+  cout << "C";
+  // Perform a forward pass to get activations
+  this->forward();
+  cout << "D";
+  // Backpropagate the errors
+  this->backward();
+
+  cout << "E" << endl;
+  // Get the gradients in each layer
+  for(int i=0; i<this->connections.size(); i++)
+  {
+    cout << i << ":" << endl;
+    cout << this->connections.at(i)->getGradient() << endl;
+
+    gradients.push_back(this->connections.at(i)->getGradient());
+  }
+  cout << "F" << endl;
+
+  return gradients;
 }
