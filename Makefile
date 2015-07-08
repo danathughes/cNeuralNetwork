@@ -14,6 +14,9 @@ _OBJ = Layer.o FullConnection.o Bias.o SigmoidLayer.o LinearLayer.o SoftmaxLayer
 
 OBJ = $(patsubst %,$(OBJ_DIR)/%,$(_OBJ))
 
+recurrentTest: $(OBJ) $(OBJ_DIR)/recurrentTest.o
+	$(CC) -o $@ $^ $(CFLAGS)
+
 xor: $(OBJ) $(OBJ_DIR)/xor.o
 	$(CC) -o $@ $^ $(CFLAGS)
 

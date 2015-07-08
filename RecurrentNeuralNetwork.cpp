@@ -15,6 +15,7 @@
 */
 
 #include <iostream>
+#include <typeinfo>
 
 #include "RecurrentNeuralNetwork.h"
 #include <vector>
@@ -40,6 +41,14 @@ void RecurrentNeuralNetwork::addInputLayer(Layer* layer)
 void RecurrentNeuralNetwork::addLayer(Layer* layer)
 {
   this->layers.push_back(layer);
+
+  // Is this a recurrent layer?
+  if(typeid(*layer) == typeid(RecurrentLayer))
+  {
+    // Downcast it as such and add to the list of recurrentLayers
+    RecurrentLayer* recurrentLayer = dynamic_cast<RecurrentLayer*>(layer);
+    this->recurrentLayers.push_back(recurrentLayer);
+  }
 }
 
 
@@ -58,7 +67,7 @@ void RecurrentNeuralNetwork::addConnection(Connection* connection)
 
 void RecurrentNeuralNetwork::addBias(Bias* bias)
 {
-  this->biases.push_back(bias);
+  this->connections.push_back((Connection*) bias);
 }
 
 
@@ -117,11 +126,12 @@ vector<Connection*> RecurrentNeuralNetwork::getConnections()
   return this->connections;
 }
 
-
+/*
 vector<Bias*> RecurrentNeuralNetwork::getBiases()
 {
   return this->biases;
 }
+*/
 
 vector<Layer*> RecurrentNeuralNetwork::getLayers()
 {
@@ -144,4 +154,66 @@ ObjectiveLayer* RecurrentNeuralNetwork::getObjectiveLayer()
 Layer* RecurrentNeuralNetwork::getInputLayer()
 {
   return this->inputLayer;
+}
+
+
+vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* sequence)
+{
+  vector<Eigen::MatrixXd> gradients;
+  
+  // First, reset all the recurrent layers
+  for(int i=0; i<this->recurrentLayers.size(); i++)
+  {
+    recurrentLayers.at(i)->setRecurrentInput(0*recurrentLayers.at(i)->getRecurrentInput());
+  }
+
+  // Perform a forward pass to get activations at each time step.
+  vector<vector<Eigen::VectorXd> > activation_history;
+
+  // Loop through the data, performing each activation
+  while(sequence->hasNext())
+  {
+    vector<Eigen::VectorXd> activations;
+    SupervisedData data = sequence->next();
+    this->setInput(data.getInput());
+    this->setTarget(data.getTarget());
+
+    this->forward();
+
+    for(int i=0; i<this->layers.size(); i++)
+    {
+      activations.push_back(layers.at(i)->getOutput());
+    }
+
+    // Step each recurrent layer to advance to the next time step
+    for(int i=0; i<this->recurrentLayers.size(); i++)
+    {
+      this->recurrentLayers.at(i)->step();
+    }
+
+    activation_history.push_back(activations);
+  } 
+
+  // What are the activations?
+  for(int i=0; i<activation_history.size(); i++)
+  {
+    cout << "t = " << i << endl;
+    for(int j=0; j<activation_history.at(i).size(); j++)
+    {
+      cout << "  " << activation_history.at(i).at(j).transpose() << endl;
+    }
+  }
+
+  // Backpropagate the errors
+//  this->backward();
+
+  // Get the gradients in each layer
+/*
+  for(int i=0; i<this->connections.size(); i++)
+  {
+    gradients.push_back(this->connections.at(i)->getGradient());
+  }
+*/
+
+  return gradients;
 }

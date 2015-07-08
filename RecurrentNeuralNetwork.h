@@ -19,12 +19,13 @@
 #include "ObjectiveLayer.h"
 #include "Connection.h"
 #include "Bias.h"
+#include "Sequence.h"
 
 #include <vector>
 
 
-#ifndef __FEEDFORWARDNEURALNETWORK_H__
-#define __FEEDFORWARDNEURALNETWORK_H__
+#ifndef __RECURRENTNEURALNETWORK_H__
+#define __RECURRENTNEURALNETWORK_H__
 
 using namespace std;
 
@@ -50,16 +51,21 @@ class RecurrentNeuralNetwork
 
     vector<Layer*> getLayers();
     vector<Connection*> getConnections();
-    vector<Bias*> getBiases();
+//    vector<Bias*> getBiases();
 
     Layer* getInputLayer();
     Layer* getOutputLayer();
+
     ObjectiveLayer* getObjectiveLayer();
+
+    vector<Eigen::MatrixXd> getParameterGradients(Sequence* data);
+
 
   private:
     vector<Layer*> layers;
+    vector<RecurrentLayer*> recurrentLayers;
     vector<Connection*> connections;
-    vector<Bias*> biases;
+//    vector<Bias*> biases;
 
     Layer* inputLayer;
     Layer* outputLayer;

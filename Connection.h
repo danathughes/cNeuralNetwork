@@ -29,6 +29,7 @@ class Connection
     virtual Eigen::MatrixXd getGradient()=0;
     virtual void updateWeights(Eigen::MatrixXd update)=0;
     virtual int* getDimensions()=0;
+    virtual void randomize()=0;
   private:
 };
 

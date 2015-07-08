@@ -6,3 +6,5 @@ class ObjectiveLayer : public Layer
   public:
     virtual void cost()=0;
 }
+
+#endif
