@@ -1,7 +1,7 @@
 /**
-* \class GradientDescentTeacher
+* \class Teacher
 *
-* \brief A teacher which uses gradient descent to train a model
+* \brief A generic teacher 
 *
 * \author $Author: dh$
 *
@@ -16,37 +16,43 @@
 
 
 #include <vector>
-#include "GradientDescentTeacher.h"
+#include "Teacher.h"
 
 #include <iostream>
 
 using namespace std;
 
-GradientDescentTeacher::GradientDescentTeacher(FeedForwardNeuralNetwork* model, vector<SupervisedData*> dataset)
+Teacher::Teacher(FeedForwardNeuralNetwork* model, vector<SupervisedData*> dataset)
 {
   this->dataset = dataset;
   this->model = model;
 
   this->connections = model->getConnections();
+//  this->biases = model->getBiases();
 
   vector<Eigen::MatrixXd> connectionGradients;
+//  vector<Eigen::VectorXd> biasGradients;
 
   for(int i=0; i<connections.size(); i++)
   {
     this->connectionGradients.push_back(connections.at(i)->getGradient());
   }
-
-
+/*
+  for(int i=0; i<biases.size(); i++)
+  {
+    this->biasGradients.push_back(biases.at(i)->getGradient());
+  }
+*/
 }
 
 
-GradientDescentTeacher::~GradientDescentTeacher()
+Teacher::~Teacher()
 {
 
 }
 
 
-void GradientDescentTeacher::train()
+void Teacher::train()
 {
   double cost = 0.0;
   double learningRate = 0.25;
@@ -57,7 +63,12 @@ void GradientDescentTeacher::train()
   while(!this->stoppingCriteria->stop())
   {
     cost = 0.0;
-
+/*
+    for(int j=0; j<this->biasGradients.size(); j++)
+    {
+      this->biasGradients.at(j) *= 0;
+    }
+*/
     for(int j=0; j<this->connectionGradients.size(); j++)
     {
       this->connectionGradients.at(j) *= 0;
@@ -73,13 +84,18 @@ void GradientDescentTeacher::train()
       this->model->forward();
       cost += this->model->getObjectiveLayer()->cost();
       this->model->backward(); 
-
+/*
+      for(int k=0; k<this->biases.size(); k++)
+      {
+        this->biasGradients.at(k) += this->biases.at(k)->getGradient();
+      }
+*/
       for(int k=0; k<this->connections.size(); k++)
       {
         this->connectionGradients.at(k) += this->connections.at(k)->getGradient();
       }
 
-      cout << this->model->getOutputLayer()->getOutput() << "\t";
+      cout << (this->model->getOutputLayer()->getOutput()).transpose() << "\t";
     }
 
     cout << cost / dataset.size() << endl;
@@ -88,14 +104,19 @@ void GradientDescentTeacher::train()
     {
       this->connections.at(j)->updateWeights(-learningRate*this->connectionGradients.at(j));
     }
-
+/*
+    for(int j=0; j<biases.size(); j++)
+    {
+      this->biases.at(j)->updateWeights(-learningRate*this->biasGradients.at(j));
+    }
+*/
     numIterations++;
     this->stoppingCriteria->update();
   }
 }
 
 
-void GradientDescentTeacher::setStoppingCriteria(StoppingCriteria* criteria)
+void Teacher::setStoppingCriteria(StoppingCriteria* criteria)
 {
   this->stoppingCriteria = criteria;
 }

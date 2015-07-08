@@ -72,7 +72,7 @@ int* Bias::getDimensions()
 
 Eigen::VectorXd Bias::getNetOutput()
 {
-  return this->getBias();
+  return this->getBias()
 }
 
 

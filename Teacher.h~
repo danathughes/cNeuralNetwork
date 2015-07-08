@@ -46,7 +46,7 @@ class Teacher
     // vector<Bias*> biases;
 
     vector<Eigen::MatrixXd> connectionGradients;
-    // vector<Eigen::MatrixXd> biasGradients;
+    vector<Eigen::MatrixXd> biasGradients;
 
     StoppingCriteria* stoppingCriteria;
 };
