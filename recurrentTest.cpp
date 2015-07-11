@@ -11,6 +11,7 @@
 #include "Sequence.h"
 #include "ObjectiveLayer.h"
 #include "CrossEntropyErrorLayer.h"
+#include "SquaredErrorLayer.h"
 #include "SupervisedData.h"
 
 #include <iostream>
@@ -72,23 +73,23 @@ int main()
   cout << "Creating the layers and connections" << endl;
 
   Layer* input = new LinearLayer(3);
+  input->setName("input");
   RecurrentLayer* hidden = new RecurrentLayer(new LinearLayer(2));
-  Layer* output = new SoftmaxLayer(2);
+  hidden->setName("hidden");
+  Layer* output = new SigmoidLayer(2);
+  output->setName("output");
 
   Layer* target = new LinearLayer(2);
+  target->setName("target");
 
   FullConnection* input_to_hidden = new FullConnection(input, hidden);
   FullConnection* hidden_to_output = new FullConnection(hidden, output);
   FullConnection* hidden_to_hidden = new FullConnection(hidden, hidden->getRecurrentConnection());
   Bias* hidden_bias = new Bias(hidden);
   Bias* output_bias = new Bias(output);
-/*
-  input_to_hidden->randomize();
-  hidden_to_output->randomize();
-  hidden_to_hidden->randomize();
-  hidden_bias->randomize();
-  output_bias->randomize();
-*/
+
+
+  cout << "Setting the weights of the connections" << endl;
   Eigen::MatrixXd Wih(2,3);
   Wih << 0.1, 0.2, 0.3,
          0.4, 0.5, 0.6;
@@ -105,9 +106,11 @@ int main()
          0.75, 0.25;
   hidden_to_output->updateWeights(Who);
 
+  cout << "All set" << endl;
 
-  ObjectiveLayer* objective = new CrossEntropyErrorLayer(2, target);
+  ObjectiveLayer* objective = new SquaredErrorLayer(2, target);
   IdentityConnection* output_to_objective = new IdentityConnection(output, objective);
+  objective->setName("objective");
 
   cout << "Adding the layers to the RNN" << endl;
   rnn.addInputLayer(input);
@@ -122,13 +125,23 @@ int main()
   cout << "Adding the connections to the RNN" << endl;
 
   rnn.addConnection(input_to_hidden);
+  rnn.addConnection(hidden_to_hidden);
   rnn.addConnection(hidden_to_output);
   rnn.addConnection(output_to_objective);
+  rnn.addConnection(hidden_bias);
+  rnn.addConnection(output_bias);
 
   cout << "Running the sequence through the rnn" << endl;
-  rnn.getParameterGradients(&seq);
+  vector<Eigen::MatrixXd> grad = rnn.getParameterGradients(&seq);
 
+  cout << "Gradient size: " << grad.size() << endl;
 
+  cout << "Input to hidden:" << endl << grad.at(0) << endl;
+  cout << "Hidden to hidden:" << endl << grad.at(1) << endl;
+  cout << "Hidden to output:" << endl << grad.at(2) << endl;
+  cout << "Output to Objective:" << endl << grad.at(3) << endl;
+  cout << "Hidden bias:" << endl << grad.at(4) << endl;
+  cout << "Output bias:" << endl <<grad.at(5) << endl;
 
   return 0;
 }

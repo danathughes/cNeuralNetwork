@@ -16,6 +16,7 @@
 */
 
 #include <Eigen/Dense>
+#include <iostream>
 
 #include "Layer.h"
 #include "SquaredErrorLayer.h"
@@ -63,4 +64,7 @@ void SquaredErrorLayer::backprop()
   {
     this->deltas(i) = grad(i);
   }
+  cout << "---" << this->target->getOutput().transpose();
+  cout << "---" << this->net_input.transpose();
+  cout << "---" << this->getName() << ": " << grad.transpose() << endl;
 }

@@ -53,12 +53,12 @@ void RecurrentLayer::step()
   this->recurrentLayer->activate();
 }
 
-/*
-Eigen::VectorXd RecurrentLayer::getRecurrentInput()
+
+void RecurrentLayer::backstep()
 {
-  return Eigen::VectorXd(0);
+  this->recurrentLayer->setDelta(this->deltas);
 }
-*/
+
 
 Layer* RecurrentLayer::getRecurrentConnection()
 {

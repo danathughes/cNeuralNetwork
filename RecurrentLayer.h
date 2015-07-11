@@ -46,6 +46,7 @@ class RecurrentLayer : public Layer
     Layer* getRecurrentConnection();
 
     void step();
+    void backstep();
 
 //    Eigen::VectorXd getRecurrentInput();
 //    void addRecurrentInputConnection(Connection* connection);

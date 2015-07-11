@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include "Bias.h"
 #include "Connection.h"
+#include "string"
 
 using namespace std;
 
@@ -24,6 +25,17 @@ Layer::~Layer()
 }
 
 
+void Layer::setName(string name)
+{
+  this->name = name;
+}
+
+string Layer::getName()
+{
+  return this->name;
+}
+
+
 int Layer::getSize()
 {
   return this->size;
@@ -35,6 +47,15 @@ void Layer::setInput(Eigen::VectorXd input)
   for(int i=0; i<this->size; i++)
   {
     this->net_input(i) = input(i);
+  }
+}
+
+
+void Layer::setOutput(Eigen::VectorXd output)
+{
+  for(int i=0; i<this->size; i++)
+  {
+    this->activations(i) = output(i);
   }
 }
 
@@ -54,6 +75,21 @@ Eigen::VectorXd Layer::getOutput()
 Eigen::VectorXd Layer::getDeltas()
 {
   return this->deltas;
+}
+
+
+void Layer::setDelta(Eigen::VectorXd delta)
+{
+  for(int i=0; i<this->size; i++)
+  {
+    this->deltas(i) = delta(i);
+  }
+}
+
+
+void Layer::clearDeltas()
+{
+  this->deltas *= 0.0;
 }
 
 

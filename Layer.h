@@ -15,7 +15,7 @@
 */
 
 #include <Eigen/Dense>
-
+#include <string>
 #include <vector>
 
 #ifndef __LAYER_H__
@@ -41,14 +41,19 @@ class Layer
     virtual Eigen::VectorXd gradient() = 0;
 
     void setInput(Eigen::VectorXd input);
+    void setOutput(Eigen::VectorXd output);
     void setDelta(Eigen::VectorXd delta);
     Eigen::VectorXd getInput();
     Eigen::VectorXd getOutput();
     Eigen::VectorXd getDeltas();
+    void clearDeltas();
 
     void addInputConnection(Connection* connection);
     void addOutputConnection(Connection* connection);
     void addBias(Bias* bias);
+
+    void setName(string name);
+    string getName();
 
     vector<Connection*> getInputConnections();
     vector<Bias*> getBiases();
@@ -66,6 +71,8 @@ class Layer
     vector<Connection*> inputConnections;
     vector<Connection*> outputConnections;
     vector<Bias*> biases;
+
+    string name;
 };
 
 #endif

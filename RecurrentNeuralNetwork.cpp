@@ -16,7 +16,9 @@
 
 #include <iostream>
 #include <typeinfo>
+#include <Eigen/Dense>
 
+#include "Layer.h"
 #include "RecurrentNeuralNetwork.h"
 #include <vector>
 using namespace std;
@@ -160,7 +162,16 @@ Layer* RecurrentNeuralNetwork::getInputLayer()
 vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* sequence)
 {
   vector<Eigen::MatrixXd> gradients;
-  
+  vector<vector<Eigen::VectorXd> > delta_history;
+  vector<vector<Eigen::VectorXd> > activation_history;
+  vector<vector<Eigen::VectorXd> > net_input_history;
+
+  // Initialize the gradients to zero
+  for(int i=0; i<this->connections.size(); i++)
+  {
+    gradients.push_back(0.0*this->connections.at(i)->getGradient());
+  }
+
   // First, reset all the recurrent layers
   for(int i=0; i<this->recurrentLayers.size(); i++)
   {
@@ -168,12 +179,13 @@ vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* 
   }
 
   // Perform a forward pass to get activations at each time step.
-  vector<vector<Eigen::VectorXd> > activation_history;
 
   // Loop through the data, performing each activation
   while(sequence->hasNext())
   {
     vector<Eigen::VectorXd> activations;
+    vector<Eigen::VectorXd> net_inputs;
+   
     SupervisedData data = sequence->next();
     this->setInput(data.getInput());
     this->setTarget(data.getTarget());
@@ -182,6 +194,7 @@ vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* 
 
     for(int i=0; i<this->layers.size(); i++)
     {
+      net_inputs.push_back(layers.at(i)->getInput());
       activations.push_back(layers.at(i)->getOutput());
     }
 
@@ -191,29 +204,74 @@ vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* 
       this->recurrentLayers.at(i)->step();
     }
 
+    net_input_history.push_back(net_inputs);
     activation_history.push_back(activations);
   } 
 
   // What are the activations?
+  /*
   for(int i=0; i<activation_history.size(); i++)
   {
     cout << "t = " << i << endl;
     for(int j=0; j<activation_history.at(i).size(); j++)
     {
-      cout << "  " << activation_history.at(i).at(j).transpose() << endl;
+      cout << "  " << this->layers.at(j)->getName() << ": ";
+      cout << activation_history.at(i).at(j).transpose() << endl;
+    }
+  }
+  */
+ 
+  // Backpropagate the errors.  The final deltas need to be set to zero,
+  // so that no weight update is propagated backwards through time.
+  for(int i=0; i<this->recurrentLayers.size(); i++)
+  {
+    Layer* recurrentLayer = this->recurrentLayers.at(i)->getRecurrentConnection();
+    Eigen::VectorXd delta = recurrentLayer->getDeltas();
+    recurrentLayer->clearDeltas();
+  }
+
+  // Starting with the final activation, work backwards through time--
+  // Calculate the deltas, get the gradients, then step the delta's 
+  // backward through time.
+  for(int i=activation_history.size()-1; i>=0; i--)
+  {
+    vector<Eigen::VectorXd> activations = activation_history.at(i);
+    vector<Eigen::VectorXd> net_inputs = net_input_history.at(i);
+
+    // Set the activations for this time step
+    for(int j=0; j<this->layers.size(); j++)
+    {
+      layers.at(j)->setInput(activations.at(j));
+      layers.at(j)->setOutput(activations.at(j));
+    }
+
+    // Set the target output
+    this->setInput(sequence->getDataAt(i).getInput());
+    this->setTarget(sequence->getDataAt(i).getTarget());
+    this->inputLayer->activate();
+//    this->targetLayer->activate();
+
+    // And backprop
+    this->backward();
+
+    // Update the gradients
+    for(int j=0; j<this->connections.size(); j++)
+    {
+      gradients.at(j) += this->connections.at(j)->getGradient();
+    }
+
+    // Move the deltas backwards in the recurrent layers
+    for(int j=0; j<this->recurrentLayers.size(); j++)
+    {
+      this->recurrentLayers.at(j)->backstep();
     }
   }
 
-  // Backpropagate the errors
-//  this->backward();
-
-  // Get the gradients in each layer
-/*
-  for(int i=0; i<this->connections.size(); i++)
+  // The gradients are averaged over the total time
+  for(int i=0; i<gradients.size(); i++)
   {
-    gradients.push_back(this->connections.at(i)->getGradient());
+    gradients.at(i) /= sequence->getLength();
   }
-*/
 
   return gradients;
 }
