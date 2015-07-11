@@ -37,6 +37,8 @@ class FullConnection : public Connection
 
     void randomize();
 
+    Eigen::MatrixXd getWeights();
+
     Eigen::VectorXd getNetOutput();
     Eigen::VectorXd backpropDelta();
 

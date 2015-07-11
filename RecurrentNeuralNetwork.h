@@ -51,7 +51,6 @@ class RecurrentNeuralNetwork
 
     vector<Layer*> getLayers();
     vector<Connection*> getConnections();
-//    vector<Bias*> getBiases();
 
     Layer* getInputLayer();
     Layer* getOutputLayer();
@@ -61,6 +60,7 @@ class RecurrentNeuralNetwork
     vector<Eigen::MatrixXd> getParameterGradients(Sequence* data);
 
     double cost(Sequence* data);
+    vector<Eigen::VectorXd> output(Sequence* data);
 
   private:
     vector<Layer*> layers;

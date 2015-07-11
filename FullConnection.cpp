@@ -72,3 +72,9 @@ int* FullConnection::getDimensions()
 {
   return dim;
 }
+
+
+Eigen::MatrixXd FullConnection::getWeights()
+{
+  return *(this->weights);
+}

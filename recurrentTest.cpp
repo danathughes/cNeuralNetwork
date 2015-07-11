@@ -73,9 +73,9 @@ RecurrentNeuralNetwork createRNN()
 
   Layer* input = new LinearLayer(3);
   input->setName("input");
-  RecurrentLayer* hidden = new RecurrentLayer(new LinearLayer(2));
+  RecurrentLayer* hidden = new RecurrentLayer(new SigmoidLayer(2));
   hidden->setName("hidden");
-  Layer* output = new SigmoidLayer(2);
+  Layer* output = new SoftmaxLayer(2);
   output->setName("output");
   Layer* target = new LinearLayer(2);
   target->setName("target");
@@ -92,10 +92,10 @@ RecurrentNeuralNetwork createRNN()
   hidden_bias->randomize();
   output_bias->randomize();
 
+//  cout << "Wih:" << endl << input_to_hidden->getWeights() << endl;
 
-  ObjectiveLayer* objective = new SquaredErrorLayer(2, target);
+  ObjectiveLayer* objective = new CrossEntropyErrorLayer(2, target);
   IdentityConnection* output_to_objective = new IdentityConnection(output, objective);
-  objective->setName("objective");
 
   rnn.addInputLayer(input);
   rnn.addLayer(hidden);
@@ -128,8 +128,25 @@ int main()
 
   cout << "Initial cost: " << rnn.cost(&seq) << endl;
 
-  cout << "Running the sequence through the rnn" << endl;
-  vector<Eigen::MatrixXd> grad = rnn.getParameterGradients(&seq);
+  double learning_rate = 0.01;
 
+  for(int i=0; i<100000; i++)
+  {
+    cout << i  << ": " << rnn.cost(&seq) << endl;
+    vector<Eigen::VectorXd> output = rnn.output(&seq);
+    for(int j=0; j<output.size(); j++)
+    {
+      cout << "  " << output.at(j).transpose() << endl;
+    }
+
+    vector<Eigen::MatrixXd> grad = rnn.getParameterGradients(&seq);
+
+    for(int j=0; j<rnn.getConnections().size(); j++)
+    {
+      rnn.getConnections().at(j)->updateWeights(-learning_rate*grad.at(j));
+    }
+  }
+
+ 
   return 0;
 }

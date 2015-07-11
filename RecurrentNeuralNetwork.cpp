@@ -277,3 +277,21 @@ double RecurrentNeuralNetwork::cost(Sequence* sequence)
 
   return cost;
 }
+
+
+vector<Eigen::VectorXd> RecurrentNeuralNetwork::output(Sequence* sequence)
+{
+  sequence->reset();
+
+  vector<Eigen::VectorXd> output;
+
+  while(sequence->hasNext())
+  {
+    SupervisedData data = sequence->next();
+    this->setInput(data.getInput());
+    this->forward();
+    output.push_back(this->getOutputLayer()->getOutput());
+  }
+
+  return output;
+}
