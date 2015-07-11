@@ -19,11 +19,8 @@
 using namespace std;
 
 
-int main()
+Sequence createSequence()
 {
-  // Create a sequence
-  cout << "Creating a sequence" << endl;
-
   vector<SupervisedData> s;
   Eigen::VectorXd inp(3);
   Eigen::VectorXd tgt(2);
@@ -66,11 +63,13 @@ int main()
 
   Sequence seq(s);
 
-  cout << "Creating an RNN" << endl;
+  return seq;
+}
 
+
+RecurrentNeuralNetwork createRNN()
+{
   RecurrentNeuralNetwork rnn;
-
-  cout << "Creating the layers and connections" << endl;
 
   Layer* input = new LinearLayer(3);
   input->setName("input");
@@ -78,7 +77,6 @@ int main()
   hidden->setName("hidden");
   Layer* output = new SigmoidLayer(2);
   output->setName("output");
-
   Layer* target = new LinearLayer(2);
   target->setName("target");
 
@@ -88,31 +86,17 @@ int main()
   Bias* hidden_bias = new Bias(hidden);
   Bias* output_bias = new Bias(output);
 
+  input_to_hidden->randomize();
+  hidden_to_output->randomize();
+  hidden_to_hidden->randomize();
+  hidden_bias->randomize();
+  output_bias->randomize();
 
-  cout << "Setting the weights of the connections" << endl;
-  Eigen::MatrixXd Wih(2,3);
-  Wih << 0.1, 0.2, 0.3,
-         0.4, 0.5, 0.6;
-  input_to_hidden->updateWeights(Wih);
-
-
-  Eigen::MatrixXd Whh(2,2);
-  Whh << 0.1, 0.2,
-         0.2, 0.1;
-  hidden_to_hidden->updateWeights(Whh);
-
-  Eigen::MatrixXd Who(2,2);
-  Who << 0.25, 0.75,
-         0.75, 0.25;
-  hidden_to_output->updateWeights(Who);
-
-  cout << "All set" << endl;
 
   ObjectiveLayer* objective = new SquaredErrorLayer(2, target);
   IdentityConnection* output_to_objective = new IdentityConnection(output, objective);
   objective->setName("objective");
 
-  cout << "Adding the layers to the RNN" << endl;
   rnn.addInputLayer(input);
   rnn.addLayer(hidden);
   rnn.addOutputLayer(output);
@@ -122,7 +106,6 @@ int main()
   rnn.setTargetLayer(target);
   rnn.setObjectiveLayer(objective);
 
-  cout << "Adding the connections to the RNN" << endl;
 
   rnn.addConnection(input_to_hidden);
   rnn.addConnection(hidden_to_hidden);
@@ -131,17 +114,22 @@ int main()
   rnn.addConnection(hidden_bias);
   rnn.addConnection(output_bias);
 
+  return rnn;
+}
+
+int main()
+{
+  // Create a sequence
+  cout << "Creating a sequence" << endl;
+  Sequence seq = createSequence();
+
+  cout << "Creating an RNN" << endl;
+  RecurrentNeuralNetwork rnn = createRNN();
+
+  cout << "Initial cost: " << rnn.cost(&seq) << endl;
+
   cout << "Running the sequence through the rnn" << endl;
   vector<Eigen::MatrixXd> grad = rnn.getParameterGradients(&seq);
-
-  cout << "Gradient size: " << grad.size() << endl;
-
-  cout << "Input to hidden:" << endl << grad.at(0) << endl;
-  cout << "Hidden to hidden:" << endl << grad.at(1) << endl;
-  cout << "Hidden to output:" << endl << grad.at(2) << endl;
-  cout << "Output to Objective:" << endl << grad.at(3) << endl;
-  cout << "Hidden bias:" << endl << grad.at(4) << endl;
-  cout << "Output bias:" << endl <<grad.at(5) << endl;
 
   return 0;
 }

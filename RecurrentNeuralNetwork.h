@@ -60,6 +60,7 @@ class RecurrentNeuralNetwork
 
     vector<Eigen::MatrixXd> getParameterGradients(Sequence* data);
 
+    double cost(Sequence* data);
 
   private:
     vector<Layer*> layers;

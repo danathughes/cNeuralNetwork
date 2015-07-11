@@ -14,7 +14,7 @@
 * 
 */
 
-#include <iostream>
+//#include <iostream>
 #include <typeinfo>
 #include <Eigen/Dense>
 
@@ -128,12 +128,6 @@ vector<Connection*> RecurrentNeuralNetwork::getConnections()
   return this->connections;
 }
 
-/*
-vector<Bias*> RecurrentNeuralNetwork::getBiases()
-{
-  return this->biases;
-}
-*/
 
 vector<Layer*> RecurrentNeuralNetwork::getLayers()
 {
@@ -180,6 +174,8 @@ vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* 
 
   // Perform a forward pass to get activations at each time step.
 
+  sequence->reset();
+
   // Loop through the data, performing each activation
   while(sequence->hasNext())
   {
@@ -207,19 +203,6 @@ vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* 
     net_input_history.push_back(net_inputs);
     activation_history.push_back(activations);
   } 
-
-  // What are the activations?
-  /*
-  for(int i=0; i<activation_history.size(); i++)
-  {
-    cout << "t = " << i << endl;
-    for(int j=0; j<activation_history.at(i).size(); j++)
-    {
-      cout << "  " << this->layers.at(j)->getName() << ": ";
-      cout << activation_history.at(i).at(j).transpose() << endl;
-    }
-  }
-  */
  
   // Backpropagate the errors.  The final deltas need to be set to zero,
   // so that no weight update is propagated backwards through time.
@@ -274,4 +257,23 @@ vector<Eigen::MatrixXd> RecurrentNeuralNetwork::getParameterGradients(Sequence* 
   }
 
   return gradients;
+}
+
+
+double RecurrentNeuralNetwork::cost(Sequence* sequence)
+{
+  double cost = 0.0;
+
+  sequence->reset();
+
+  while(sequence->hasNext())
+  {
+    SupervisedData data = sequence->next();
+    this->setInput(data.getInput());
+    this->setTarget(data.getTarget());
+    this->forward();
+    cost += this->getObjectiveLayer()->cost();
+  }
+
+  return cost;
 }

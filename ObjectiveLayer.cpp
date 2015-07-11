@@ -5,5 +5,5 @@ using namespace std;
 
 ObjectiveLayer::ObjectiveLayer(int size) : Layer(size)
 {
-//  cout << "In ObjectiveLayer.." << endl;
+
 }
